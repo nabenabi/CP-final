@@ -34,3 +34,6 @@ A (Availability) | Firebase を使用して可用性を維持する
 | C (Confidentiality) | 읽는 것은 모두에 한정한다.<br> 사유 : 개인정보의 위협이 적은 사례로 판단 |
 | I (Integrity) | 무결성을 위해 해당 이력을 작성하는것을 본인에 한정하여 작성이 가능하게 설정한다 |
 | A (Availability) | Firebase로 가용성을 유지한다|
+
+
+©Lee gilho, Student Member of the Korea Institute of Information Security & Cryptology (KIISC)
