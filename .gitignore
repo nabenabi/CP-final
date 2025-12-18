@@ -5,4 +5,5 @@
 *.swp
 .vscode/
 typings/
+www/config.js
 node_modules
