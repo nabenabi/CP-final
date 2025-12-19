@@ -29,31 +29,44 @@ function createPost(title, content) {
 }
 
 function createPostElement(post) {
+    if (!post || !post.id) return '';
     const canEdit = currentUser && post.userId === currentUser.uid;
     return `
     <div class="post" id="post-${post.id}" data-title="${escapeHtml(post.title || '')}" data-day-start="${post.dayStart || ''}" data-day-end="${post.dayEnd || ''}">
         <div class="post-header">
-            <span class="post-author">${escapeHtml(post.author)}</span>
+            <span class="post-title">${escapeHtml(post.title || 'タイトルなし')}</span>
             ${canEdit ? `
             <div class="post-actions">
                 <button class="btn-edit" onclick="startEdit('${post.id}')">編集</button>
                 <button class="btn-delete" onclick="deletePost('${post.id}')">削除</button>
             </div>` : ''}
         </div>
-        <div class="post-content">${escapeHtml(post.content)}</div>
+        <div class="post-meta">
+            <span class="post-date">${post.dayStart && post.dayEnd ? `${timestampToDateInput(post.dayStart)} ~ ${timestampToDateInput(post.dayEnd)}` : ''}</span>
+        </div>
+        <div class="post-content">${escapeHtml(post.content || '内容なし')}</div>
         <div class="post-footer">
-            <span class="post-time">${formatTimestamp(post.timestamp)}</span>
+            <span class="post-time">${post.timestamp ? formatTimestamp(post.timestamp) : ''}</span>
         </div>
     </div>`;
 }
 
 function loadPosts() {
-    if (postsListener) postsRef.off('value', postsListener);
-    postsListener = postsRef.on('value', snap => {
+    // 기존 리스너 완전 해제
+    postsRef.off('value');
+    
+    // 새 리스너 설정
+    postsRef.on('value', snap => {
         const posts = [];
-        snap.forEach(c => posts.push({ id: c.key, ...c.val() }));
+        const data = snap.val();
+        if (data) {
+            Object.keys(data).forEach(key => {
+                posts.push({ id: key, ...data[key] });
+            });
+        }
         posts.sort((a,b)=>b.timestamp-a.timestamp);
-        $('#postsList').empty().append(posts.map(createPostElement));
+        console.log('로드된 게시글 수:', posts.length, 'posts:', posts);
+        $('#postsList').empty().html(posts.map(createPostElement).join(''));
     });
 }
 
@@ -98,5 +111,6 @@ function handleDelete() {
     postsRef.child(currentEditId).remove().then(() => {
         showMessage('削除しました');
         closeModal('deleteModal');
+        loadPosts();
     });
 }
