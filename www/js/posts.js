@@ -31,7 +31,7 @@ function createPost(title, content) {
 function createPostElement(post) {
     const canEdit = currentUser && post.userId === currentUser.uid;
     return `
-    <div class="post" id="post-${post.id}" data-day-start="${post.dayStart || ''}" data-day-end="${post.dayEnd || ''}">
+    <div class="post" id="post-${post.id}" data-title="${escapeHtml(post.title || '')}" data-day-start="${post.dayStart || ''}" data-day-end="${post.dayEnd || ''}">
         <div class="post-header">
             <span class="post-author">${escapeHtml(post.author)}</span>
             ${canEdit ? `
@@ -61,6 +61,7 @@ function startEdit(id) {
     currentEditId = id;
     $('#editContent').val($(`#post-${id} .post-content`).text());
     const $el = $(`#post-${id}`);
+    $('#editTitle').val($el.attr('data-title') || '');
     const dsTs = parseInt($el.attr('data-day-start')) || null;
     const deTs = parseInt($el.attr('data-day-end')) || null;
     $('#editDayStart').val(dsTs ? timestampToDateInput(dsTs) : '');
@@ -75,6 +76,7 @@ function handleUpdate() {
     const dayStartVal = $('#editDayStart').val();
     const dayEndVal = $('#editDayEnd').val();
     const updateObj = {
+        title: $('#editTitle').val(),
         content,
         dayStart: dateToTimestamp(dayStartVal),
         dayEnd: dateToTimestamp(dayEndVal),
