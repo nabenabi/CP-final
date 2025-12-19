@@ -1,0 +1,59 @@
+<body>
+<div class="container">
+<h1>掲示板アプリ</h1>
+
+<div id="messageArea"></div>
+
+<div class="auth-container logged-out">
+<div class="form-group">
+<label>メールアドレス</label>
+<input id="loginEmail" class="form-control">
+</div>
+<div class="form-group">
+<label>パスワード</label>
+<input id="loginPassword" type="password" class="form-control">
+</div>
+<div class="button-group">
+<button id="loginButton" class="btn-primary">ログイン</button>
+</div>
+</div>
+
+<div class="user-info logged-in">
+<span>ログイン中：<span id="userEmail"></span></span>
+<button id="logoutButton" class="btn-secondary">ログアウト</button>
+</div>
+
+<div class="post-form logged-in">
+<div class="form-group">
+<input type="date" id="dayStart" class="form-control">
+<input type="date" id="dayEnd" class="form-control">
+<input id="titleInput" class="form-control">
+<textarea id="contentInput" class="form-control"></textarea>
+</div>
+<div class="button-group">
+<button id="postButton" class="btn-primary" type="button">投稿する</button>
+</div>
+</div>
+
+<div class="posts-container">
+<h2>投稿一覧</h2>
+<div id="postsList"></div>
+</div>
+</div>
+
+<div id="editModal" class="modal">
+<div class="modal-overlay"></div>
+<div class="modal-content">
+<textarea id="editContent" class="form-control"></textarea>
+<button onclick="handleUpdate()" class="btn-primary">更新</button>
+</div>
+</div>
+
+<div id="deleteModal" class="modal">
+<div class="modal-overlay"></div>
+<div class="modal-content">
+<p>削除しますか？</p>
+<button onclick="handleDelete()" class="btn-danger">削除</button>
+</div>
+</div>
+</body>

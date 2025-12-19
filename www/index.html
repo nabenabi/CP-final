@@ -1,85 +1,137 @@
 <!DOCTYPE HTML>
 <html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta http-equiv="Content-Security-Policy" content="default-src * data: gap: content: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: content: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
 
-<script src="cordova.js"></script>
-<script src="components/loader.js"></script>
-<link rel="stylesheet" href="components/loader.css">
-<link rel="stylesheet" href="css/style.css">
-
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="config.js"></script>
-
-<script src="js/state.js"></script>
-<script src="js/utils.js"></script>
-<script src="js/posts.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/ui.js"></script>
-<script src="js/main.js"></script>
-</head>
+        <script src="cordova.js"></script>
+        <script src="components/loader.js"></script>
+        <link rel="stylesheet" href="components/loader.css">
+        <link rel="stylesheet" href="css/style.css">
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+        <script src="config.js"></script>
+        <script src="js/state.js"></script>
+        <script src="js/utils.js"></script>
+        <script src="js/posts.js"></script>
+        <script src="js/auth.js"></script>
+        <script src="js/ui.js"></script>
+        <script src="js/main.js"></script>
+    </head>
 
 <body>
-<div class="container">
-<h1>掲示板アプリ</h1>
+    <div class="container">
+        <h1>掲示板アプリ</h1>
 
-<div id="messageArea"></div>
+        <!-- メッセージ表示エリア -->
+        <div id="messageArea"></div>
 
-<div class="auth-container logged-out">
-<div class="form-group">
-<label>メールアドレス</label>
-<input id="loginEmail" class="form-control">
-</div>
-<div class="form-group">
-<label>パスワード</label>
-<input id="loginPassword" type="password" class="form-control">
-</div>
-<div class="button-group">
-<button id="loginButton" class="btn-primary">ログイン</button>
-</div>
-</div>
+        <!-- 認証フォーム（未ログイン時表示） -->
+        <div class="auth-container logged-out">
+            <div class="form-group">
+                <label for="loginEmail">メールアドレス</label>
+                <input type="email" id="loginEmail"
+                       class="form-control" placeholder="example@example.com">
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">パスワード</label>
+                <input type="password" id="loginPassword"
+                       class="form-control" placeholder="6文字以上">
+                <small class="help-text">※新規登録時は6文字以上</small>
+            </div>
+            <div class="button-group">
+                <button id="loginButton" class="btn-primary">ログイン</button>
+                <button id="registerButton" class="btn-secondary">新規登録</button>
+            </div>
+        </div>
 
-<div class="user-info logged-in">
-<span>ログイン中：<span id="userEmail"></span></span>
-<button id="logoutButton" class="btn-secondary">ログアウト</button>
-</div>
+        <!-- ログイン情報（ログイン時表示） -->
+        <div class="user-info logged-in">
+            <span>ログイン中：<span id="userEmail"></span></span>
+            <button id="logoutButton" class="btn-secondary">ログアウト</button>
+        </div>
 
-<div class="post-form logged-in">
-<div class="form-group">
-<input type="date" id="dayStart" class="form-control">
-<input type="date" id="dayEnd" class="form-control">
-<input id="titleInput" class="form-control">
-<textarea id="contentInput" class="form-control"></textarea>
-</div>
-<div class="button-group">
-<button id="postButton" class="btn-primary" type="button">投稿する</button>
-</div>
-</div>
+        <!-- 投稿フォーム（ログイン時表示） -->
+        <div class="post-form logged-in">
+            <div class="form-group">
+                <label for="titleInput">タイトル</label>
+                <input id="titleInput" class="form-control">
+                <label for="dayStart">開始日</label>
+                <input type="date" id="dayStart" class="form-control">
+                <label for="dayEnd">終了日</label>
+                <input type="date" id="dayEnd" class="form-control">
+                
+                <label for="contentInput">投稿内容</label>
+                <textarea id="contentInput" class="form-control"
+                          placeholder="投稿内容を入力してください"></textarea>
+                <small class="character-count" id="contentCount">0/1000</small>
+            </div>
+            <div class="button-group">
+                <button id="postButton" class="btn-primary" type="button">投稿する</button>
+            </div>
+        </div>
 
-<div class="posts-container">
-<h2>投稿一覧</h2>
-<div id="postsList"></div>
-</div>
-</div>
+        <!-- 投稿一覧 -->
+        <div class="posts-container">
+            <h2>投稿一覧</h2>
+            <div class="posts-control">
+                <select id="sortOrder" class="form-control">
+                    <option value="newest">新しい順</option>
+                    <option value="oldest">古い順</option>
+                </select>
+            </div>
+            <div id="postsList"></div>
+            <div id="loadingSpinner" class="loading-spinner" style="display: none;">
+                <div class="spinner"></div>
+                <p>読み込み中...</p>
+            </div>
+        </div>
+    </div>
 
-<div id="editModal" class="modal">
-<div class="modal-overlay"></div>
-<div class="modal-content">
-<textarea id="editContent" class="form-control"></textarea>
-<button onclick="handleUpdate()" class="btn-primary">更新</button>
-</div>
-</div>
+    <!-- 編集モーダルウィンドウ -->
+    <div id="editModal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>投稿を編集</h3>
+                <button class="modal-close" onclick="closeModal('editModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="editDayStart">開始日</label>
+                    <input type="date" id="editDayStart" class="form-control">
+                    <label for="editDayEnd">終了日</label>
+                    <input type="date" id="editDayEnd" class="form-control">
+                    <textarea id="editContent" class="form-control"></textarea>
+                    <small class="character-count" id="editContentCount">0/1000</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="handleUpdate()" class="btn-primary">更新</button>
+                <button onclick="closeModal('editModal')" class="btn-cancel">キャンセル</button>
+            </div>
+        </div>
+    </div>
 
-<div id="deleteModal" class="modal">
-<div class="modal-overlay"></div>
-<div class="modal-content">
-<p>削除しますか？</p>
-<button onclick="handleDelete()" class="btn-danger">削除</button>
-</div>
-</div>
+    <!-- 削除確認モーダルウィンドウ -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>投稿の削除</h3>
+                <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>この投稿を削除してもよろしいですか？</p>
+                <p class="text-danger">この操作は取り消せません。</p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="handleDelete()" class="btn-danger">削除</button>
+                <button onclick="closeModal('deleteModal')" class="btn-cancel">キャンセル</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

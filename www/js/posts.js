@@ -31,7 +31,7 @@ function createPost(title, content) {
 function createPostElement(post) {
     const canEdit = currentUser && post.userId === currentUser.uid;
     return `
-    <div class="post" id="post-${post.id}">
+    <div class="post" id="post-${post.id}" data-day-start="${post.dayStart || ''}" data-day-end="${post.dayEnd || ''}">
         <div class="post-header">
             <span class="post-author">${escapeHtml(post.author)}</span>
             ${canEdit ? `
@@ -60,6 +60,11 @@ function loadPosts() {
 function startEdit(id) {
     currentEditId = id;
     $('#editContent').val($(`#post-${id} .post-content`).text());
+    const $el = $(`#post-${id}`);
+    const dsTs = parseInt($el.attr('data-day-start')) || null;
+    const deTs = parseInt($el.attr('data-day-end')) || null;
+    $('#editDayStart').val(dsTs ? timestampToDateInput(dsTs) : '');
+    $('#editDayEnd').val(deTs ? timestampToDateInput(deTs) : '');
     showModal('editModal');
 }
 
@@ -67,10 +72,16 @@ function handleUpdate() {
     const content = $('#editContent').val();
     if (!validateContent(content)) return;
 
-    postsRef.child(currentEditId).update({
+    const dayStartVal = $('#editDayStart').val();
+    const dayEndVal = $('#editDayEnd').val();
+    const updateObj = {
         content,
+        dayStart: dateToTimestamp(dayStartVal),
+        dayEnd: dateToTimestamp(dayEndVal),
         updatedAt: firebase.database.ServerValue.TIMESTAMP
-    }).then(() => {
+    };
+
+    postsRef.child(currentEditId).update(updateObj).then(() => {
         showMessage('更新しました');
         closeModal('editModal');
     });

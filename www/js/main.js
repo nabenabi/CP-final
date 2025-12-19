@@ -1,6 +1,9 @@
 $(function() {
-    firebase.initializeApp(firebaseConfig);
-    postsRef = firebase.database().ref('posts');
+    if (window.__appInitialized) return; // guard against double init (e.g. hot reload / duplicate script)
+    window.__appInitialized = true;
+
+    const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
+    postsRef = app.database().ref('posts');
 
     firebase.auth().onAuthStateChanged(user => {
         currentUser = user;
@@ -15,7 +18,8 @@ $(function() {
         loadPosts();
     });
 
-    $('#postButton').on('click', () => {
+    $('#postButton').off('click').on('click', (e) => {
+        e.preventDefault(); // 기본 동작 중단
         createPost($('#titleInput').val(), $('#contentInput').val());
     });
 
